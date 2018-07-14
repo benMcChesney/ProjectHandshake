@@ -10,12 +10,13 @@ openCV_with_UI - openCV UI with Tkinter
 
 # Environment Setup
 
-conda create -n handshake-openCVTest python=3.5
+>conda create -n handshake-openCVTest python=3.5
 
+# Command Args Example
 
-# dependencies
+>python openCV_with_ui.py -config config.json
 
-pip install Pillow
-pip install matplotlib
-pip install opencv_python
-pip install numpy
+# Dependencies
+
+To install dependencies use the requirements.txt file
+>pip install -r requirements.txt
