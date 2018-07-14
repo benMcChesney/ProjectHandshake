@@ -1,0 +1,1 @@
+{"label": "test config", "vision": {"maxThreshold": 255, "minThreshold": 98}, "camera": {"device_id": 0}}
