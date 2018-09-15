@@ -3,8 +3,15 @@ import argparse
 import tkinter
 from tkinter import *
 
+# Computer Vision
 import face_recognition
 import cv2
+
+# sockets
+import asyncio
+import websockets
+
+from SocketClientExample import sendMessage
 
 class Rectangle:
     x = 0
@@ -70,7 +77,9 @@ class App:
         # self.loadConfigButton.pack(padx=15, pady=5, side=LEFT)
         # self.loadConfigButton = Button(window, text="Load Config", command=self.loadConfigButtonClickHandler())
         # self.loadConfigButton.pack(padx=15, pady=5, side=LEFT)
-
+        # networking setup
+        self.websocket = websockets.connect('ws://localhost:8765/')
+        # openCV initialization
         self.video_capture = cv2.VideoCapture(0)
         self.loadFacesFromDirectory(self.args.directory)
 
@@ -106,6 +115,42 @@ class App:
 
 
         print('as')
+    '''
+    @asyncio.coroutine
+    def sendSocket(self, _name):
+        print( 'sending socket for!', _name)
+
+        #websocket = yield from websockets.connect(
+        #    'ws://localhost:8765/')
+
+        try:
+            yield from self.websocket.send(_name)
+            print("> {}".format(_name))
+
+            # greeting = yield from self.websocket.recv()
+            # print("< {}".format(greeting))
+
+        finally:
+            yield from self.websocket.close()
+
+
+        self.websocket.send(_name)
+        #websocket = yield from websockets.connect(
+        #    'ws://localhost:8765/')
+
+        #try:
+        #    _name = input("What's your name? ")
+
+         #   yield from websocket.send(_name)
+         #   print("> {}".format(_name))
+
+         #   greeting = yield from websocket.recv()
+         #   print("< {}".format(greeting))
+
+
+        #finally:
+        #    yield from websocket.close()
+        '''
 
     def update(self):
         
@@ -123,6 +168,7 @@ class App:
         saved_face = Rectangle()
 
 
+        savedName = "name"
         # Loop through each face in this frame of video
         for (top, right, bottom, left), face_encoding in zip(face_locations, face_encodings):
             # See if the face is a match for the known face(s)
@@ -140,8 +186,15 @@ class App:
                 first_match_index = matches.index(True)
                 name = self.known_face_names[first_match_index]
 
+                print('sending name to server!')
+
+                # send Name information to server
+                asyncio.get_event_loop().run_until_complete(sendMessage(name))
+                # socket.sendName(name)
+
             # Draw a box around the face
             cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
+
 
             # debug tracing out values for manual calibration
             # take area at 1 ft , and 3 ft. Test at 2ft.
@@ -150,20 +203,15 @@ class App:
             if key == ord('c'):
                 saved_face.print()
 
+
             # Draw a label with a name below the face
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
-            if ( saved_face.x != 0 ):
-                label = saved_face.getCoords()
-                cv2.putText(frame, label, (left + 6, bottom - 6), font, 1.0, (0, 0, 0), 1)
-            else:
-                cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+            cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+
 
         # Display the resulting image
         cv2.imshow('Video', frame)
-
-
-
 
         # do this at the end of update
         self.window.after(self.delay, self.update)

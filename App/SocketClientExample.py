@@ -6,6 +6,23 @@ import asyncio
 import websockets
 
 @asyncio.coroutine
+def sendMessage( message ):
+    websocket = yield from websockets.connect(
+        'ws://localhost:8765/')
+
+    try:
+        # name = input("What's your name? ")
+
+        yield from websocket.send(message)
+        print("> {}".format(message))
+
+        greeting = yield from websocket.recv()
+        print("< {}".format(greeting))
+
+    finally:
+        yield from websocket.close()
+
+
 def hello():
     websocket = yield from websockets.connect(
         'ws://localhost:8765/')
@@ -22,4 +39,4 @@ def hello():
     finally:
         yield from websocket.close()
 
-asyncio.get_event_loop().run_until_complete(hello())
+# asyncio.get_event_loop().run_until_complete(hello())
