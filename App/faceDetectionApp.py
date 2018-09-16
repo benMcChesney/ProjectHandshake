@@ -11,7 +11,7 @@ import cv2
 import asyncio
 import websockets
 
-from SocketClientExample import sendMessage
+from SocketClientManager import send_face
 
 class Rectangle:
     x = 0
@@ -100,7 +100,6 @@ class App:
         local_path = os.getcwd() + '\\' + str(path)
         files = os.listdir(local_path)
 
-
         for file in files:
             dotIndex = file.find('.')
             # print('file is: ', file)
@@ -112,45 +111,6 @@ class App:
             face_encoding = face_recognition.face_encodings(file_image)[0]
             self.known_face_encodings.append(face_encoding)
             print( 'adding face:',fileName)
-
-
-        print('as')
-    '''
-    @asyncio.coroutine
-    def sendSocket(self, _name):
-        print( 'sending socket for!', _name)
-
-        #websocket = yield from websockets.connect(
-        #    'ws://localhost:8765/')
-
-        try:
-            yield from self.websocket.send(_name)
-            print("> {}".format(_name))
-
-            # greeting = yield from self.websocket.recv()
-            # print("< {}".format(greeting))
-
-        finally:
-            yield from self.websocket.close()
-
-
-        self.websocket.send(_name)
-        #websocket = yield from websockets.connect(
-        #    'ws://localhost:8765/')
-
-        #try:
-        #    _name = input("What's your name? ")
-
-         #   yield from websocket.send(_name)
-         #   print("> {}".format(_name))
-
-         #   greeting = yield from websocket.recv()
-         #   print("< {}".format(greeting))
-
-
-        #finally:
-        #    yield from websocket.close()
-        '''
 
     def update(self):
         
@@ -188,8 +148,8 @@ class App:
 
                 print('sending name to server!')
 
-                # send Name information to server
-                asyncio.get_event_loop().run_until_complete(sendMessage(name))
+                # send face information to server
+                asyncio.get_event_loop().run_until_complete( send_face(name))
                 # socket.sendName(name)
 
             # Draw a box around the face
